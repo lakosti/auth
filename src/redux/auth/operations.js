@@ -1,8 +1,10 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-// import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // react1001@mail.com
 // react100@mail.com
+
+//! token - унікальний ключ доступу до бекенду (ств при логіні)
 
 axios.defaults.baseURL = "https://goit-task-manager.herokuapp.com/";
 
@@ -20,7 +22,15 @@ axios.defaults.baseURL = "https://goit-task-manager.herokuapp.com/";
  *
  * After successful registration, add the token to the HTTP header
  */
-// export const register =
+export const register = createAsyncThunk("auth/register", async (newUser, thunkAPI) => {
+  try {
+    const response = await axios.post("/users/signup", newUser);
+    //? newUser - це об'єкт який збирає formik при реєстрації
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
 
 /*
  * POST @ /users/login
@@ -28,7 +38,7 @@ axios.defaults.baseURL = "https://goit-task-manager.herokuapp.com/";
  *
  * After successful login, add the token to the HTTP header
  */
-// export const logIn =
+export const logIn = createAsyncThunk("auth/login", async () => {});
 
 /*
  * POST @ /users/logout
@@ -36,4 +46,4 @@ axios.defaults.baseURL = "https://goit-task-manager.herokuapp.com/";
  *
  * After a successful logout, remove the token from the HTTP header
  */
-// export const logOut =
+export const logOut = createAsyncThunk("auth/logout", async () => {});
