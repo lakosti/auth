@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchTasks, addTask, deleteTask } from "./operations";
+import { logOut } from "../auth/operations";
 
 const tasksSlice = createSlice({
   name: "tasks",
+  //! початкові дані
   initialState: {
     items: [],
     isLoading: false,
@@ -46,6 +48,11 @@ const tasksSlice = createSlice({
       .addCase(deleteTask.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        state.items = []; //* обнуляємо / скидаємо дані коли користувач вийшов
+        state.isLoading = false;
+        state.error = null;
       });
   },
 });
