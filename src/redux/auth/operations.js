@@ -69,5 +69,37 @@ export const logOut = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   }
 });
 
+//* GET /users/me
+export const refresh = createAsyncThunk(
+  "auth/refresh",
+  async (_, thunkAPI) => {
+    try {
+      //* thunkAPI.getState -- отримуємо посилання на весь стан у редаксі і звідти у auth беремо token який появився там при монтуванні (логіна)
+      const reduxState = thunkAPI.getState();
+      const savedToken = reduxState.auth.token;
+
+      //*будь який запит на бекенд буде тепер відправлятися із нашим збереженим токеном і якщо він валідний то будуть підгружитися дані за користувача при перезавантаженні
+      setAuthHeader(savedToken);
+
+      const response = await axios.get("/users/me");
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+  {
+    condition(_, thunkAPI) {
+      const reduxState = thunkAPI.getState();
+      const savedToken = reduxState.auth.token;
+
+      //*якщо є бережений токен - то запускай операції (оскільки коли ми розлогінились токін уже не валідний, і нам не потрібно при перезавантаженні грузити цього юзера, бо він вийшов)
+      return savedToken !== null;
+    },
+  }
+);
+
 //*для виходу користувача необхідний токен який ми добуваємо після успішного запиту
 //* цей токен додається до всіх наступних запитів (logout, etc...) але тільки тоді коли у нас успішна реєстрація або логін
+//*для того щоб зберегти користувача при перезавантеженні чи робимо refresh запит за збереженим токеном
+
+//*{condition ()=>{}} -- об'єкт налаштувань -- за якої умови запускаєтсья запит (якщо вона повертає true - запит іде, якщо false - запита немає)

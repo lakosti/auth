@@ -8,7 +8,6 @@ export default function LoginForm() {
   const dispatch = useDispatch();
 
   const handleSubmit = (values, actions) => {
-    actions.resetForm();
     dispatch(logIn(values))
       .unwrap()
       .then((resp) => {
@@ -19,6 +18,7 @@ export default function LoginForm() {
         console.log(err);
         toast.error("Incorrect email or password");
       });
+    actions.resetForm();
   };
   return (
     <Formik
